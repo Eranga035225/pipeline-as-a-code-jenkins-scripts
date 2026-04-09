@@ -13,11 +13,7 @@ pipeline {
             }
         }
 
-        stage('Unit test') {
-            steps {
-                sh 'mvn test'
-            }
-        }
+        
 
         stage('Build') {
             steps {
@@ -30,6 +26,19 @@ pipeline {
                     archiveArtifacts artifacts: '**/*.war'
                 }
             }
+        }
+
+        stage('Unit test') {
+            steps {
+                sh 'mvn test'
+            }
+        }
+
+        stage('Checkstyle Analysis'){
+          steps{
+            sh 'mvn checkstyle:checkstyle'
+
+          }
         }
     }
 }
