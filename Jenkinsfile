@@ -6,6 +6,10 @@ pipeline {
         jdk "JDK17"
     }
 
+    options {
+        timeout(time: 30, unit: 'MINUTES')
+    }
+
     stages {
         stage('Fetch code') {
             steps {
@@ -13,13 +17,10 @@ pipeline {
             }
         }
 
-        
-
         stage('Build') {
             steps {
-                sh 'mvn install -DskipTests'
+                sh 'mvn clean install -DskipTests'
             }
-
             post {
                 success {
                     echo "Archiving the artifacts"
@@ -34,19 +35,38 @@ pipeline {
             }
         }
 
-        stage('Checkstyle Analysis'){
-          steps{
-            sh 'mvn checkstyle:checkstyle'
-
-          }
+        stage('Checkstyle Analysis') {
+            steps {
+                sh 'mvn checkstyle:checkstyle'
+            }
         }
 
-        stage("Sonar Code Analysis"){
-          steps {
-            withSonarQubeEnv("sonar"){
-              sh 'mvn clean package sonar:sonar'
+        stage('Sonar Code Analysis') {
+            environment {
+                scannerHome = tool 'sonar8.0'
             }
-          }
+            steps {
+                withSonarQubeEnv("sonarserver") {
+                    sh '''
+                    ${scannerHome}/bin/sonar-scanner \
+                    -Dsonar.projectKey=vprofile \
+                    -Dsonar.projectName=vprofile \
+                    -Dsonar.projectVersion=1.0 \
+                    -Dsonar.sources=src/ \
+                    -Dsonar.java.binaries=target/ \
+                    -Dsonar.junit.reportsPath=target/surefire-reports/ \
+                    -Dsonar.jacoco.reportsPath=target/jacoco.exec \
+                    -Dsonar.java.checkstyle.reportPaths=target/checkstyle-result.xml
+                    '''
+                }
+            }
+        }
+        stage("Quality Gate"){
+            steps {
+                timeout(time: 1, unit: 'HOURS') {
+                    waitForQualityGate abortPipeline: true
+                }
+            }
         }
     }
 }
