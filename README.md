@@ -17,7 +17,7 @@ The objective was to automate the software delivery process while improving depl
 # 🏗️ Pipeline Architecture
 
 <p align="center">
-<img src="docs/architecture.png" width="1000">
+<img src="screenshots/Screenshot 2026-04-09 093207.png" width="1000">
 </p>
 
 ---
