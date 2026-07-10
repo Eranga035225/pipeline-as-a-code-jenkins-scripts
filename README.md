@@ -1,4 +1,8 @@
 # 🚀 End-to-End CI/CD Pipeline for the vProfile Application using Jenkins, Docker & AWS ECS
+<p align="center">
+<img src="architecture-pipeline.gif" width="1000">
+</p>
+
 
 
 
